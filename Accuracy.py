@@ -8,6 +8,7 @@ import numpy as np
 import LSH
 import pandas as pd
 
+
 class CrossValidate(object):
     def __init__(self, input, output, n_folds=5):
         self.data_folds = {}

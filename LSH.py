@@ -40,6 +40,7 @@ class MinHash(object):
         self.headers = list(input_matrix)
         self.result = pd.DataFrame(columns=['neighbors', 'item'])
         self.program_by_category = {}
+        self.program_by_date = {}
 
         # unique items are keys we want to hash
         counter = 0
@@ -58,24 +59,27 @@ class MinHash(object):
             table = soup.find('table', {'class': 'views-table cols-17'})
             courses = table.find_all('div', {'class': 'heading'})
             topics = table.find_all('div', {'class': 'pf_col span_2_of_12 span_1_of_6 span_3_of_4 '})
+            dates = table.find_all('div', {'class': 'pf_col span_3_of_12 span_1_of_6 span_3_of_4 pf_paddingBelowShowMore '})
             for i in range(len(courses)):
-                self.program_by_category[courses[i].text.replace('NEW', '').strip()] = topics[i].text.strip()
+                program_name = courses[i].text.replace('NEW', '').strip()
+                self.program_by_category[program_name] = topics[i].text.strip()
+                self.program_by_date[program_name] = dates[i].text.strip()
 
-            program_by_category = {
-                'Advanced Management Program': 'comprehensive',
-                'Digital Marketing Strategy': 'marketing',
-                'Executive Development Program': 'comprehensive',
-                'Finance and Accounting for the Nonfinancial Executive': 'finance',
-                'High Impact Leadership': 'leadership',
-                'Implementing Winning Strategies': 'strategies',
-                'Leading Strategic Growth and Change': 'strategies',
-                'Negotiation Strategies': 'leadership',
-                'Personal Leadership and Success (Online)': 'leadership',
-                'Value Investing': 'finance'
-            }
-            for i in program_by_category:
-                if i not in self.program_by_category:
-                    self.program_by_category[i] = program_by_category[i]
+            # program_by_category = {
+            #     'Advanced Management Program': 'comprehensive',
+            #     'Digital Marketing Strategy': 'marketing',
+            #     'Executive Development Program': 'comprehensive',
+            #     'Finance and Accounting for the Nonfinancial Executive': 'finance',
+            #     'High Impact Leadership': 'leadership',
+            #     'Implementing Winning Strategies': 'strategies',
+            #     'Leading Strategic Growth and Change': 'strategies',
+            #     'Negotiation Strategies': 'leadership',
+            #     'Personal Leadership and Success (Online)': 'leadership',
+            #     'Value Investing': 'finance'
+            # }
+            # for i in program_by_category:
+            #     if i not in self.program_by_category:
+            #         self.program_by_category[i] = program_by_category[i]
 
     def train(self):
         self.create_hash_functions()
@@ -186,18 +190,35 @@ class MinHash(object):
         if p > n:
             print("Error.")
             quit()
-        recommended_programs = []
+        recommended_programs = {}
+        rank = 1
         program_categories = []
         for k in range(classes.shape[0]):
             kth_value = classes.iloc[k]
             program_name = classes[classes == kth_value].index[0]
+            if "Online" in program_name:
+                online = "yes"
+            else:
+                online = "no"
+
             if len(recommended_programs) == n:
                 break
             if len(recommended_programs) >= (n-p):
                 if self.program_by_category[program_name] not in program_categories:
-                    recommended_programs.append(program_name)
+                    recommended_programs['Rank {}'.format(rank)]= {'name': program_name,
+                                                                   'percentage': int(kth_value*100),
+                                                                   'onlne': online,
+                                                                   'dates': self.program_by_date[program_name],
+                                                                   'wildcard': 'yes'}
                     program_categories.append(self.program_by_category[program_name])
+                    rank += 1
             else:
-                recommended_programs.append(program_name)
+                recommended_programs['Rank {}'.format(rank)] = {'name': program_name,
+                                                                'percentage': int(kth_value*100),
+                                                                'onlne': online,
+                                                                'dates': self.program_by_date[program_name],
+                                                                'wildcard': 'no'}
                 program_categories.append(self.program_by_category[program_name])
+                rank += 1
+
         return recommended_programs
