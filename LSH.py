@@ -65,22 +65,6 @@ class MinHash(object):
                 self.program_by_category[program_name] = topics[i].text.strip()
                 self.program_by_date[program_name] = dates[i].text.strip()
 
-            # program_by_category = {
-            #     'Advanced Management Program': 'comprehensive',
-            #     'Digital Marketing Strategy': 'marketing',
-            #     'Executive Development Program': 'comprehensive',
-            #     'Finance and Accounting for the Nonfinancial Executive': 'finance',
-            #     'High Impact Leadership': 'leadership',
-            #     'Implementing Winning Strategies': 'strategies',
-            #     'Leading Strategic Growth and Change': 'strategies',
-            #     'Negotiation Strategies': 'leadership',
-            #     'Personal Leadership and Success (Online)': 'leadership',
-            #     'Value Investing': 'finance'
-            # }
-            # for i in program_by_category:
-            #     if i not in self.program_by_category:
-            #         self.program_by_category[i] = program_by_category[i]
-
     def train(self):
         self.create_hash_functions()
         self.to_signature_matrix()
