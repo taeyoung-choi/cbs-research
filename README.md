@@ -35,7 +35,7 @@ data.split()
 ```
 
 ### Parameter Tuning
-LSH with minhash takes the number of hash functions within each band and the number of bands as parameters. In order to tune the parameters, we run the evaluation method for different candidates.
+LSH with minhash takes the number of hash functions within each band and the number of bands as parameters. In order to tune the parameters, we run the evaluation method for a range of integer values.
 ```python
 tuned_param = list()
 for i in range(2, 6):
@@ -49,6 +49,7 @@ for i in range(2, 6):
             tuned_param = [i, j, mean_score]
 print("best param: ", tuned_param[0], tuned_param[1])
 ```
+We define success if user picks an item among recommended items and calculate accuracy.
 
 ### Prediction
 After optimizing the parameters, we can fit a model and make a prediction for a specific user.
